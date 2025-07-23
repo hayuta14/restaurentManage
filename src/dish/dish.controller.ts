@@ -10,6 +10,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { User } from 'src/common/decorators/user.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { DishResponseDTO } from './dto/diskResponseDTO';
+import { ApiResponseWithArrayModel, ApiResponseWithModel } from 'src/common/decorators/swagger.decorator';
 
 @ApiTags('dish')
 @Controller('dish')
@@ -19,16 +20,16 @@ export class DishController {
   @Post('create')
   @ApiOperation({ summary: 'Tạo mới món ăn' })
   @ApiBody({ type: CreateDishDto })
-  @ApiResponse({ status: 201, description: 'Dish created', type: APIResponseDTO })
+  @ApiResponseWithModel(String,201)
   async create(@Body() createDishDto: CreateDishDto, @User() user: any) {
     const dish = await this.dishService.create(createDishDto);
     return new APIResponseDTO<string>(true, dish);
   }
 
-  @Get(':id')
+  @Get('detail/:id')
   @ApiOperation({ summary: 'Lấy chi tiết món ăn theo id' })
   @ApiParam({ name: 'id', type: String, description: 'ID của món ăn' })
-  @ApiResponse({ status: 200, description: 'Dish detail', type: APIResponseDTO })
+  @ApiResponseWithModel(Dish,200)
   async findOne(@Param('id') id: string) {
     if (!id || isNaN(Number(id))) {
       throw new BadRequestException('Invalid dish id');
@@ -41,7 +42,7 @@ export class DishController {
   @ApiOperation({ summary: 'Lấy danh sách món ăn (phân trang)' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  @ApiResponse({ status: 200, description: 'Danh sách món ăn', type: APIResponseDTO<Dish[]> })
+  @ApiResponseWithArrayModel(DishResponseDTO,200)
   async findAll(
     @Query('page') page: string,
     @Query('limit') limit: string,
@@ -50,7 +51,7 @@ export class DishController {
     const limitNum = Number(limit) || 10;
     console.log(pageNum, limitNum);
     const dish = await this.dishService.findAll(pageNum, limitNum);
-    return new APIResponseDTO(true, dish);
+    return new APIResponsePagingDTO<DishResponseDTO[]>(true, dish.dishResponseDTO, dish.paging);
   }
 
   @Get('search')
@@ -58,7 +59,7 @@ export class DishController {
   @ApiQuery({ name: 'q', required: true, type: String, description: 'Từ khóa tìm kiếm', example: 'phở' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  @ApiResponse({ status: 200, description: 'Kết quả tìm kiếm', type: APIResponsePagingDTO<DishResponseDTO[]> })
+  @ApiResponseWithArrayModel(DishResponseDTO,200)
   async searchDish(
     @Query('q') q: string,
     @Query('page') page: string,
@@ -70,20 +71,20 @@ export class DishController {
     return new APIResponsePagingDTO(true, result.data, result.paging);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   @ApiOperation({ summary: 'Cập nhật món ăn' })
   @ApiParam({ name: 'id', type: String, description: 'ID của món ăn' })
   @ApiBody({ type: UpdateDishDto })
-  @ApiResponse({ status: 200, description: 'Dish updated', type: APIResponseDTO })
+  @ApiResponseWithModel(String,200)
   async update(@Param('id') id: string, @Body() updateDishDto: UpdateDishDto) {
     const dish = await this.dishService.update(id, updateDishDto);
     return new APIResponseDTO<string>(true, dish);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   @ApiOperation({ summary: 'Xóa món ăn' })
   @ApiParam({ name: 'id', type: String, description: 'ID của món ăn' })
-  @ApiResponse({ status: 200, description: 'Dish deleted', type: APIResponseDTO })
+  @ApiResponseWithModel(String,200)
   async remove(@Param('id') id: string) {
     const dish = await this.dishService.remove(id);
     return new APIResponseDTO<string>(true, dish);
@@ -94,7 +95,7 @@ export class DishController {
   @Post('tag/create')
   @ApiOperation({ summary: 'Tạo tag món ăn' })
   @ApiBody({ type: CreateDishTagDto })
-  @ApiResponse({ status: 201, description: 'Dish tag created', type: APIResponseDTO })
+  @ApiResponseWithModel(String,201)
   async createDishTag(@Body() createDishTagDto: CreateDishTagDto) {
     const dishTag = await this.dishService.createDishTag(createDishTagDto);
     return new APIResponseDTO<string>(true, dishTag);
@@ -102,35 +103,35 @@ export class DishController {
 
   @Get('tag/all')
   @ApiOperation({ summary: 'Lấy tất cả tag món ăn' })
-  @ApiResponse({ status: 200, description: 'Danh sách tag', type: APIResponseDTO })
+  @ApiResponseWithArrayModel(DishTag,200)
   async findAllDishTag() {
     const dishTag = await this.dishService.findAllDishTag();
     return new APIResponseDTO<DishTag[]>(true, dishTag);
   }
 
-  @Delete('tag/:id')
+  @Delete('tag/delete/:id')
   @ApiOperation({ summary: 'Xóa tag món ăn' })
   @ApiParam({ name: 'id', type: String, description: 'ID của tag' })
-  @ApiResponse({ status: 200, description: 'Tag deleted', type: APIResponseDTO })
+  @ApiResponseWithModel(String,200)
   async deleteDishTag(@Param('id') id: string) {
     const dishTag = await this.dishService.deleteDishTag(id);
     return new APIResponseDTO<string>(true, dishTag);
   }
 
-  @Get('tag/:id')
+  @Get('tag/detail/:id')
   @ApiOperation({ summary: 'Lấy chi tiết tag món ăn' })
   @ApiParam({ name: 'id', type: String, description: 'ID của tag' })
-  @ApiResponse({ status: 200, description: 'Tag detail', type: APIResponseDTO })
+  @ApiResponseWithModel(DishTag,200)
   async findOneDishTag(@Param('id') id: string) {
     const dishTag = await this.dishService.findOneDishTag(id);
     return new APIResponseDTO<DishTag>(true, dishTag);
   }
 
-  @Patch('tag/:id')
+  @Patch('tag/update/:id')
   @ApiOperation({ summary: 'Cập nhật tag món ăn' })
   @ApiParam({ name: 'id', type: String, description: 'ID của tag' })
   @ApiBody({ type: UpdateDishTagDto })
-  @ApiResponse({ status: 200, description: 'Tag updated', type: APIResponseDTO })
+  @ApiResponseWithModel(String,200)
   async updateDishTag(@Param('id') id: string, @Body() updateDishTagDto: UpdateDishTagDto) {
     const dishTag = await this.dishService.updateDishTag(id, updateDishTagDto);
     return new APIResponseDTO<string>(true, dishTag);

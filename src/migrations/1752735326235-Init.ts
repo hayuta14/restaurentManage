@@ -4,6 +4,7 @@ export class Init1752735326235 implements MigrationInterface {
     name = 'Init1752735326235'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
         await queryRunner.query(`CREATE TABLE "dishes" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "description" text NOT NULL, "price" numeric NOT NULL, "image_url" text, "created_by" uuid NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_f4748c8e8382ad34ef517520b7b" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "dish_tags" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, CONSTRAINT "PK_16fe57ccaa45160f7f49d29c032" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "dish_tag_map" ("dish_id" uuid NOT NULL, "tag_id" uuid NOT NULL, CONSTRAINT "PK_bdb98a8982fe62928f530073e09" PRIMARY KEY ("dish_id", "tag_id"))`);

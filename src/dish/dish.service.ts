@@ -41,12 +41,15 @@ export class DishService {
       created_at: dish.created_at,
       tags: dish.tags.map((tag) => tag.name),
     }));
+    const paging = {
+      page,
+      limit,
+      total,
+    };
 
     return {
       dishResponseDTO,
-      total,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
+      paging,
     };}
 
   async findOne(id: string) {
@@ -63,11 +66,17 @@ export class DishService {
 
   async update(id: string, updateDishDto: UpdateDishDto) {
     const {name, price, description, image_url, tags_id} = updateDishDto;
-    const dish = await this.dishRepository.findOne({where: {id:+id}});
+    const dish = await this.dishRepository.findOne({where: {id:+id}, relations: ['tags']});
     if(!dish){
       throw new NotFoundException('Dish not found');
     }
-    await this.dishRepository.update(id, updateDishDto);
+    const tags = await this.dishTagRepository.find({ where: { id: In(tags_id ?? []) } });
+    dish.name = name ?? dish.name;
+    dish.price = price ?? dish.price;
+    dish.description = description ?? dish.description;
+    dish.image_url = image_url ?? dish.image_url;
+    dish.tags = tags;
+    await this.dishRepository.save(dish);
     return 'Dish updated successfully';
   }
 

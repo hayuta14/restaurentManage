@@ -2,6 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiResponseWithModel } from 'src/common/decorators/swagger.decorator';
+import { User } from './entities/user.entity';
+
 
 @Controller('user')
 export class UserController {
@@ -10,6 +13,7 @@ export class UserController {
 
 
   @Get()
+  @ApiResponseWithModel(User)
   findAll() {
     return this.userService.findAll();
   }
