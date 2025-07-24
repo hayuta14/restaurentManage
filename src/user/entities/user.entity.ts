@@ -1,7 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Dish } from 'src/dish/entities/dish.entity';
+import { Dish } from '../../dish/entities/dish.entity';
 
 @Entity('users')
 export class User {
@@ -31,6 +37,6 @@ export class User {
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 
-  @OneToMany(() => Dish, dish => dish.creator)
+  @OneToMany(() => Dish, (dish) => dish.creator)
   dishes: Dish[];
 }

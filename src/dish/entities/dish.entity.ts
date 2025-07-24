@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
 import { DishTag } from './dish_tag.entity';
@@ -34,12 +43,11 @@ export class Dish {
   @IsNotEmpty()
   image_url: string;
 
-
   @ManyToOne(() => User)
   @JoinColumn({ name: 'created_by' })
   creator: User;
 
-  @ManyToMany(() => DishTag, tag => tag.dishes, { cascade: true })
+  @ManyToMany(() => DishTag, (tag) => tag.dishes, { cascade: true })
   @JoinTable({
     name: 'dish_tag_map',
     joinColumn: { name: 'dish_id', referencedColumnName: 'id' },

@@ -15,6 +15,6 @@ export class DishTag {
   @IsString()
   name: string;
 
-  @ManyToMany(() => Dish, dish => dish.tags)
+  @ManyToMany(() => Dish, (dish) => dish.tags)
   dishes: Dish[];
-} 
+}

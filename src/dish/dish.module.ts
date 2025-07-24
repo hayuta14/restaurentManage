@@ -6,7 +6,7 @@ import { Dish } from './entities/dish.entity';
 import { DishTag } from './entities/dish_tag.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Dish,DishTag])],
+  imports: [TypeOrmModule.forFeature([Dish, DishTag])],
   controllers: [DishController],
   providers: [DishService],
 })

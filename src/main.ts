@@ -14,11 +14,13 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Global validation pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Swagger configuration
   const config = new DocumentBuilder()
@@ -39,7 +41,11 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
-  console.log(`Application is running on: http://localhost:${process.env.PORT ?? 3001}`);
-  console.log(`Swagger documentation is available at: http://localhost:${process.env.PORT ?? 3001}/api`);
+  console.log(
+    `Application is running on: http://localhost:${process.env.PORT ?? 3001}`,
+  );
+  console.log(
+    `Swagger documentation is available at: http://localhost:${process.env.PORT ?? 3001}/api`,
+  );
 }
 bootstrap();
